@@ -1,0 +1,40 @@
+FROM python:2-alpine
+
+MAINTAINER Jim Hickey
+
+RUN apk add --no-cache --update \
+    bash \
+    git \
+    openssh-client \
+    linux-headers \
+    gcc \
+    g++ \
+    jpeg-dev \
+    libffi-dev \
+    libxml2-dev \
+    libxslt-dev \
+    openssl-dev \
+    musl-dev \
+    libev-dev \
+    make \
+    && rm -rf /var/cache/apk/*
+
+
+RUN mkdir -p /tmp/filebeat
+
+COPY aerospike-custom-setup/setup.py /temp_build/setup.py
+COPY aerospike-custom-setup/install_aerospike.sh /temp_build/install_aerospike.sh
+RUN chmod +x /temp_build/install_aerospike.sh
+RUN /temp_build/install_aerospike.sh
+RUN rm -rf /temp_build
+
+WORKDIR /app
+COPY content_analytics content_analytics
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+COPY run_production.sh /
+
+ENTRYPOINT ["/run_production.sh"]
+

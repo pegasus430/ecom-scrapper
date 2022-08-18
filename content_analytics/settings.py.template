@@ -1,0 +1,89 @@
+BOT_NAME = 'content_analytics'
+
+SPIDER_MODULES = ['content_analytics.spiders']
+NEWSPIDER_MODULE = 'content_analytics.spiders'
+
+RUNNER_MAX_TASKS = 100
+RUNNER_GRACE_PERIOD = 310
+RUNNER_GRACE_PERIOD_ENABLED = True
+RUNNER_SETTINGS_BUCKET_ENABLED = False
+REACTOR_THREADPOOL_MAXSIZE = 50
+
+LOG_LEVEL = 'DEBUG'
+# LOG_FILE = '/home/curlyfingers/runner.log'
+
+FILEBEAT_PATH = '/tmp/filebeat'
+
+INPUT_QUEUE_VISIBILITY_TIMEOUT_OFFSET = 10
+INPUT_QUEUE_NAME = 'scraper_${SPIDER_NAME}_in'
+INPUT_QUEUE_AWS_REGION_NAME = 'us-east-1'
+INPUT_QUEUE_AWS_ACCESS_KEY_ID = '${AWS_ACCESS_KEY_ID}'
+INPUT_QUEUE_AWS_SECRET_ACCESS_KEY = '${AWS_SECRET_ACCESS_KEY}'
+
+OUTPUT_QUEUE_NAME = None
+OUTPUT_QUEUE_AWS_REGION_NAME = 'us-east-1'
+OUTPUT_QUEUE_AWS_ACCESS_KEY_ID = '${AWS_ACCESS_KEY_ID}'
+OUTPUT_QUEUE_AWS_SECRET_ACCESS_KEY = '${AWS_SECRET_ACCESS_KEY}'
+
+OUTPUT_BUCKET_NAME = 'ch-responses'
+OUTPUT_BUCKET_AWS_REGION_NAME = 'us-east-1'
+OUTPUT_BUCKET_AWS_ACCESS_KEY_ID = '${AWS_ACCESS_KEY_ID}'
+OUTPUT_BUCKET_AWS_SECRET_ACCESS_KEY = '${AWS_SECRET_ACCESS_KEY}'
+
+SETTINGS_BUCKET_KEY = 'proxy_config_master.json'
+SETTINGS_BUCKET_NAME = 'scraper-settings'
+SETTINGS_BUCKET_AWS_REGION_NAME = 'us-east-1'
+SETTINGS_BUCKET_AWS_ACCESS_KEY_ID = '${AWS_ACCESS_KEY_ID}'
+SETTINGS_BUCKET_AWS_SECRET_ACCESS_KEY = '${AWS_SECRET_ACCESS_KEY}'
+
+ROBOTSTXT_OBEY = False
+TELNETCONSOLE_ENABLED = False
+
+DUPEFILTER_CLASS = 'scrapy.dupefilters.BaseDupeFilter'
+
+SPIDER_MIDDLEWARES = {
+    'scrapy.spidermiddlewares.httperror.HttpErrorMiddleware': None,
+    'content_analytics.middlewares.httperror.HttpErrorMiddleware': 50,
+    'content_analytics.middlewares.mergeitem.MergeItemMiddleware': 51,
+    'content_analytics.middlewares.technical.TechnicalMiddleware': 52,
+    'scrapy.spidermiddlewares.offsite.OffsiteMiddleware': 500,
+    'scrapy.spidermiddlewares.referer.RefererMiddleware': 700,
+    'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware': 800,
+    'scrapy.spidermiddlewares.depth.DepthMiddleware': 900,
+}
+
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': 100,
+    'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware': 300,
+    'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 350,
+    'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
+    'scrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
+    'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware': 580,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
+    'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': 600,
+    'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
+    'content_analytics.middlewares.proxy.ProxyDownloaderMiddleware': 749,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
+    'scrapy.downloadermiddlewares.stats.DownloaderStats': 850,
+    'scrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware': 900,
+    'content_analytics.middlewares.mergeitem.MergeItemDownloaderMiddleware': 999,
+}
+
+EXTENSIONS = {
+    'scrapy.extensions.telnet.TelnetConsole': None,
+    'scrapy.extensions.statsmailer.StatsMailer': None,
+    'content_analytics.extensions.filebeat.Filebeat': 10,
+}
+
+ITEM_PIPELINES = {
+    'content_analytics.pipelines.s3export.S3ExportPipeline': 999,
+}
+
+FEED_FORMAT = 'jsonlines'
+FEED_EXPORT_ENCODING = 'utf8'
+FEED_EXPORTERS = {
+    'jl': 'content_analytics.exporters.CompatibleJsonLinesItemExporter',
+    'jsonline': 'content_analytics.exporters.CompatibleJsonLinesItemExporter',
+}

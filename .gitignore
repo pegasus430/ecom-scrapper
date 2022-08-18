@@ -1,0 +1,10 @@
+*.pyc
+*.swp
+*egg-info
+.coverage
+.cache
+.tox
+doc/_build
+doc/generated
+.idea
+.pytest_cache
